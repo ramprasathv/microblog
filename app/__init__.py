@@ -1,0 +1,79 @@
+from flask import Flask # For Flask app routes
+from flask_sqlalchemy import SQLAlchemy # SQL DB
+from flask_migrate import Migrate # SQL DB Migration
+from config import Config # Internal Module: Implement Config settings
+from flask_login import LoginManager # Flask login extension to manage login sessions
+import logging # Logging package
+from logging.handlers import SMTPHandler # SMTP to send emails
+from logging.handlers import RotatingFileHandler # Log into log file
+import os
+from flask_mail import Mail # Mail extension
+from flask_bootstrap import Bootstrap # Bootstrap CSS framework
+from flask_moment import Moment
+from flask_babel import Babel
+from flask import request
+from flask_babel import lazy_gettext as _1
+
+
+app = Flask(__name__)
+
+# Instantiate Config module
+app.config.from_object(Config)
+
+# DB and Migration extensions
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# Login extension
+login = LoginManager(app)
+login.login_view = 'login'
+login.login_message = _1('Please log in to access this page.')
+
+# Mail extension
+mail = Mail(app)
+
+# Bootstrap extension
+bootstrap = Bootstrap(app)
+
+# Flask Moment extension
+moment = Moment(app)
+
+# Flask Bable extenstion for Translation
+babel = Babel(app)
+
+@babel.localeselector
+def get_locale():
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
+    # return 'es'
+
+
+from app import routes, models, errors, cli
+
+
+if not app.debug:
+    if app.config['MAIL_SERVER']:
+        auth = None
+        if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
+            auth = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
+        secure = None
+        if app.config['MAIL_USE_TLS']:
+            secure = ()
+        mail_handler = SMTPHandler(
+            mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
+            fromaddr='no-reply@' + app.config['MAIL_SERVER'],
+            toaddrs=app.config['ADMINS'], subject='Microblog Failure',
+            credentials=auth, secure=secure)
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    file_handler = RotatingFileHandler('logs/microblog.log', maxBytes=10240,
+                                       backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Microblog startup')

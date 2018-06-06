@@ -1,0 +1,17 @@
+# Ignore the venv folders
+venv/
+
+# Ignore the DBs
+*.db
+
+
+# Ignore the log files
+logs/
+app/logs/
+
+# Ignore .idea
+.idea/
+
+
+# Ignore __pycache__
+**/__pycache__/
