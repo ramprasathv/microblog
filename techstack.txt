@@ -15,6 +15,7 @@ Moment.js / Flask-Moment = Flask extension for Moment.js. Used for Timestamp con
 Flask-Babel = Translation extension
 Guess-Language_spirit = Guess language of a given text
 Boto3 = AWS SDK for Python
+Elasticsearch = Free text searching
 
 # ------------ Packages ----------------------
 alembic          0.9.9

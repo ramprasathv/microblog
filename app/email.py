@@ -1,6 +1,5 @@
 from flask_mail import Message
 from app import mail
-from app import app
 from threading import Thread
 from flask import current_app
 

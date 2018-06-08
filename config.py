@@ -13,6 +13,8 @@ class Config(object):
 
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
 
+    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
+
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
     MAIL_USE_TLS=1

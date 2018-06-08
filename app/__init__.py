@@ -13,35 +13,30 @@ from flask_moment import Moment
 from flask_babel import Babel
 from flask import request
 from flask_babel import lazy_gettext as _1
+from elasticsearch import Elasticsearch
+from flask import current_app
 
-
-
-
-app = Flask(__name__)
-
-# Instantiate Config module
-app.config.from_object(Config)
 
 # DB and Migration extensions
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+db = SQLAlchemy()
+migrate = Migrate()
 
 # Login extension
-login = LoginManager(app)
+login = LoginManager()
 login.login_view = 'auth.login'
 login.login_message = _1('Please log in to access this page.')
 
 # Mail extension
-mail = Mail(app)
+mail = Mail()
 
 # Bootstrap extension
-bootstrap = Bootstrap(app)
+bootstrap = Bootstrap()
 
 # Flask Moment extension
-moment = Moment(app)
+moment = Moment()
 
 # Flask Bable extenstion for Translation
-babel = Babel(app)
+babel = Babel()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -54,6 +49,9 @@ def create_app(config_class=Config):
     bootstrap.init_app(app)
     moment.init_app(app)
     babel.init_app(app)
+
+    app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
+        if app.config['ELASTICSEARCH_URL'] else None
 
 
     from app.errors import bp as errors_bp
@@ -83,7 +81,7 @@ def create_app(config_class=Config):
 
         if not os.path.exists('logs'):
             os.mkdir('logs')
-        file_handler = RotatingFileHandler('logs/microblog.log', maxBytes=10240,
+        file_handler = RotatingFileHandler('logs/microblog.log', maxBytes=1048576,
                                            backupCount=10)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
@@ -98,7 +96,7 @@ def create_app(config_class=Config):
 
 @babel.localeselector
 def get_locale():
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
+    return request.accept_languages.best_match(current_app.config['LANGUAGES'])
     # return 'es'
 
 

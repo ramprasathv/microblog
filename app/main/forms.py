@@ -6,7 +6,7 @@ from app.models import User # User model to validate the user/email fields
 from wtforms.validators import Length # Check the length of the text field
 from flask_babel import lazy_gettext as _1 # Strings Translation
 from flask_babel import _ # Strings Translation
-
+from flask import request # Request for the Search form
 
 class EditProfileForm(FlaskForm):
     username = StringField(_1('Username'), validators=[DataRequired()])
@@ -29,3 +29,12 @@ class PostForm(FlaskForm):
         DataRequired(), Length(min=1,max=140)])
     submit = SubmitField(_1('Submit'))
 
+class SearchForm(FlaskForm):
+    q = StringField(_1('Search'), validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        if 'formdata' not in kwargs:
+            kwargs['formdata'] = request.args
+        if 'csrf_enabled' not in kwargs:
+            kwargs['csrf_enabled'] = False
+        super(SearchForm, self).__init__(*args, **kwargs)
