@@ -17,6 +17,7 @@ Guess-Language_spirit = Guess language of a given text
 Boto3 = AWS SDK for Python
 Elasticsearch = Free text searching
 Redis Queue = Redis message queue
+HTTPAuth = For AuthN and AuthZ
 
 # ------------ Packages ----------------------
 alembic          0.9.9
